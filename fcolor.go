@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 )
 
@@ -16,22 +17,53 @@ type FColor struct {
 // ColorToFColor constructs an FColor from an existing color.Color
 func ColorToFColor(c color.Color) *FColor {
 	ri, gi, bi, ai := c.RGBA()
-	res := FColor{}
-	res.r = float64(ri) / 0xFFFF
-	res.g = float64(gi) / 0xFFFF
-	res.b = float64(bi) / 0xFFFF
-	res.a = float64(ai) / 0xFFFF
-	return &res
+	fc := FColor{}
+	fc.r = float64(ri) / 0xFFFF
+	fc.g = float64(gi) / 0xFFFF
+	fc.b = float64(bi) / 0xFFFF
+	fc.a = float64(ai) / 0xFFFF
+	return &fc
 }
 
 // ARGB32ToFColor constructs an FColor from a uint32 in format 0xAARRGGBB
 func ARGB32ToFColor(argb uint32) *FColor {
-	res := FColor{}
-	res.a = float64(argb>>(8*3)&0xFF) / 0xFF
-	res.r = float64(argb>>(8*2)&0xFF) / 0xFF
-	res.g = float64(argb>>(8*1)&0xFF) / 0xFF
-	res.b = float64(argb>>(8*0)&0xFF) / 0xFF
-	return &res
+	c := FColor{}
+	c.a = float64(argb>>(8*3)&0xFF) / 0xFF
+	c.r = float64(argb>>(8*2)&0xFF) / 0xFF
+	c.g = float64(argb>>(8*1)&0xFF) / 0xFF
+	c.b = float64(argb>>(8*0)&0xFF) / 0xFF
+	return &c
+}
+
+// HSVToFColor constructs an FColor from hue, saturation, and value
+func HSVToFColor(hue float64, sat float64, val float64) *FColor {
+	c := FColor{a: 1}
+	if sat == 0 {
+		c.r, c.g, c.b = val, val, val
+		return &c
+	}
+	hue6 := (hue - math.Floor(hue)) * 6
+	hue6r := hue6 - math.Floor(hue6)
+	f1 := val * (1 - sat)
+	f2 := val * (1 - sat*hue6r)
+	f3 := val * (1 - sat*(1-hue6r))
+	switch int(hue6) {
+	case 0:
+		c.r, c.g, c.b = val, f3, f1
+	case 1:
+		c.r, c.g, c.b = f2, val, f1
+	case 2:
+		c.r, c.g, c.b = f1, val, f3
+	case 3:
+		c.r, c.g, c.b = f1, f2, val
+	case 4:
+		c.r, c.g, c.b = f3, f1, val
+	case 5:
+		c.r, c.g, c.b = val, f1, f2
+	default:
+		log.Fatal("HSVToFColor: int(hue6) is", int(hue6))
+	}
+	return &c
 }
 
 // Cl creates a copy of the color
@@ -70,14 +102,53 @@ func (c *FColor) Multiply(factor float64) *FColor {
 	return c
 }
 
-// RGBDist returns the distance between 2 colors in RGB color space
-func RGBDist(a, b *FColor) float64 {
-	return math.Sqrt(math.Pow(a.r-b.r, 2) + math.Pow(a.g-b.g, 2) + math.Pow(a.b-b.b, 2))
+// Divide divides the components of c by divisor
+func (c *FColor) Divide(divisor float64) *FColor {
+	c.r /= divisor
+	c.g /= divisor
+	c.b /= divisor
+	c.a /= divisor
+	return c
+}
+
+// ToHSV returns the hue, saturation, and value of c in HSV color space
+func (c *FColor) ToHSV() (hue, sat, val float64) {
+	i := math.Max(math.Max(c.r, c.g), c.b)
+	j := math.Min(math.Min(c.r, c.g), c.b)
+	val = i
+	if i > 0 {
+		sat = (i - j) / i
+	} else {
+		sat = 0
+	}
+	if sat == 0 {
+		hue = 0
+		return
+	}
+	fr, fg, fb := (i-c.r)/(i-j), (i-c.g)/(i-j), (i-c.b)/(i-j)
+	switch i {
+	case c.r:
+		hue = fb - fg
+	case c.g:
+		hue = 2 + fr - fb
+	default:
+		hue = 4 + fg - fr
+	}
+	hue /= 6
+	if hue < 0 {
+		hue++
+	}
+	return
+}
+
+// RGBDist returns the distance between c and other in RGB color space
+func (c *FColor) RGBDist(other *FColor) float64 {
+	return math.Sqrt(math.Pow(c.r-other.r, 2) + math.Pow(c.g-other.g, 2) + math.Pow(c.b-other.b, 2))
 }
 
 // FColorLerp returns the linear interpolation between a and b.
 // n closer to 0 means more of a; n closer to 1 means more of b.
-func FColorLerp(a, b FColor, n float64) *FColor {
+func FColorLerp(a, b *FColor, n float64) *FColor {
 	trimFloat64(&n)
 	return a.Cl().Multiply(1 - n).Add(b.Cl().Multiply(n))
 }
