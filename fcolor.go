@@ -66,6 +66,17 @@ func HSVToFColor(hue float64, sat float64, val float64) *FColor {
 	return &c
 }
 
+// SinHueToFColor returns a color with sine wave-based hue.
+func SinHueToFColor(h float64) *FColor {
+	h *= math.Pi * 2
+	c := FColor{a: 1}
+	c.r = (math.Cos(h-math.Pi*2*0/3) + 1) / 2
+	c.g = (math.Cos(h-math.Pi*2*1/3) + 1) / 2
+	c.b = (math.Cos(h-math.Pi*2*2/3) + 1) / 2
+	c.Trim()
+	return &c
+}
+
 // Cl creates a copy of the color
 func (c *FColor) Cl() *FColor {
 	return &FColor{c.r, c.g, c.b, c.a}
@@ -151,6 +162,13 @@ func (c *FColor) RGBDist(other *FColor) float64 {
 func FColorLerp(a, b *FColor, n float64) *FColor {
 	trimFloat64(&n)
 	return a.Cl().Multiply(1 - n).Add(b.Cl().Multiply(n))
+}
+
+// ARGB32 returns c in a uint32 0xAARRGGBB
+func (c *FColor) ARGB32() uint32 {
+	c = c.Cl().Trim()
+	return uint32(c.a*0xFF)<<(8*3) | uint32(c.r*0xFF)<<(8*2) |
+		uint32(c.g*0xFF)<<(8*1) | uint32(c.b*0xFF)<<(8*0)
 }
 
 // RGBA to implement color.Color

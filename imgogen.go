@@ -12,6 +12,29 @@ import (
 
 func main() {
 	fmt.Println("Start main")
+	drawDiscourseCard()
+	fmt.Println("End main")
+}
+
+func drawDiscourseCard() {
+	outfile, err := os.Create("C:/Users/Christopher/Pictures/discourseCard.png")
+	Msv(err)
+	defer outfile.Close()
+	outimg := image.NewRGBA(image.Rect(0, 0, 600, 600))
+	bounds := outimg.Bounds()
+	width, height := bounds.Dx(), bounds.Dy()
+	RenderByFunc(nil, outimg, 1, func(inimg image.Image, outimg draw.Image, ix int, iy int, x float64, y float64) *FColor {
+		x, y = x-float64(width)/2, y-float64(height)*1.5
+		return HSVToFColor((math.Atan2(y, x)+math.Pi)/math.Pi/2*8+1.0/2+math.Sin(math.Hypot(x, y)/50), 1, 1)
+		//c := SinHueToFColor((math.Atan2(y, x)+math.Pi)/math.Pi/2*8 + 1.0/2 + math.Sin(math.Hypot(x, y)/50))
+		//hue, sat, val := c.ToHSV()
+		//return HSVToFColor(hue, sat*0+1, val*0.5+0.5)
+		//return ColorToFColor(colorful.Hcl(((math.Atan2(y, x)+math.Pi)/math.Pi/2*8+1.0/2+math.Sin(math.Hypot(x, y)/50))*360, 0.5, 0.5))
+	})
+	Msv(png.Encode(outfile, outimg))
+}
+
+func drawSkcraftSummerIcon() {
 	infile, err := os.Open("C:/Users/Christopher/Pictures/skcraftIcon.png")
 	Msv(err)
 	defer infile.Close()
@@ -21,21 +44,10 @@ func main() {
 	Msv(err)
 	defer outfile.Close()
 	outimg := image.NewRGBA(inimg.Bounds())
-	drawSkcraftSummerIcon(inimg, outimg)
-	Msv(png.Encode(outfile, outimg))
-	fmt.Println("End main")
-}
-
-func drawSkcraftSummerIcon(inimg image.Image, outimg draw.Image) {
 	bounds := inimg.Bounds()
 	fmt.Println("Bounds:", bounds)
 	width, height := bounds.Dx(), bounds.Dy()
 	fmt.Println("Dims:", width, height)
-	// for x := 0; x < width; x++ {
-	// 	for y := 0; y < height; y++ {
-	// 		outimg.Set(x, y, ColorToFColor(inimg.At(x, y)))
-	// 	}
-	// }
 	colorFG, colorBG := ARGB32ToFColor(0xFFDC5037), ARGB32ToFColor(0xFFFFFFFF)
 	distFGBG := colorFG.RGBDist(colorBG)
 	RenderByFunc(inimg, outimg, 5, func(inimg image.Image, outimg draw.Image, ix int, iy int, x float64, y float64) *FColor {
@@ -47,6 +59,7 @@ func drawSkcraftSummerIcon(inimg image.Image, outimg draw.Image) {
 		}
 		return c
 	})
+	Msv(png.Encode(outfile, outimg))
 }
 
 // RenderByFunc draws each pixel of outimg according to the colors returned by f.
