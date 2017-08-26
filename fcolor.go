@@ -73,7 +73,7 @@ func SinHueToFColor(h float64) *FColor {
 	c.r = (math.Cos(h-math.Pi*2*0/3) + 1) / 2
 	c.g = (math.Cos(h-math.Pi*2*1/3) + 1) / 2
 	c.b = (math.Cos(h-math.Pi*2*2/3) + 1) / 2
-	c.Trim()
+	c.Clamp()
 	return &c
 }
 
@@ -82,16 +82,16 @@ func (c *FColor) Cl() *FColor {
 	return &FColor{c.r, c.g, c.b, c.a}
 }
 
-func trimFloat64(n *float64) {
+func clampFloat64(n *float64) {
 	*n = math.Min(math.Max(*n, 0), 1)
 }
 
-// Trim caps each value to [0, 1]
-func (c *FColor) Trim() *FColor {
-	trimFloat64(&c.r)
-	trimFloat64(&c.g)
-	trimFloat64(&c.b)
-	trimFloat64(&c.a)
+// Clamp clamps each value to [0, 1]
+func (c *FColor) Clamp() *FColor {
+	clampFloat64(&c.r)
+	clampFloat64(&c.g)
+	clampFloat64(&c.b)
+	clampFloat64(&c.a)
 	return c
 }
 
@@ -160,20 +160,20 @@ func (c *FColor) RGBDist(other *FColor) float64 {
 // FColorLerp returns the linear interpolation between a and b.
 // n closer to 0 means more of a; n closer to 1 means more of b.
 func FColorLerp(a, b *FColor, n float64) *FColor {
-	trimFloat64(&n)
+	clampFloat64(&n)
 	return a.Cl().Multiply(1 - n).Add(b.Cl().Multiply(n))
 }
 
 // ARGB32 returns c in a uint32 0xAARRGGBB
 func (c *FColor) ARGB32() uint32 {
-	c = c.Cl().Trim()
+	c = c.Cl().Clamp()
 	return uint32(c.a*0xFF)<<(8*3) | uint32(c.r*0xFF)<<(8*2) |
 		uint32(c.g*0xFF)<<(8*1) | uint32(c.b*0xFF)<<(8*0)
 }
 
 // RGBA to implement color.Color
 func (c *FColor) RGBA() (r, g, b, a uint32) {
-	c = c.Cl().Trim()
+	c = c.Cl().Clamp()
 	return uint32(c.r * 0xFFFF), uint32(c.g * 0xFFFF),
 		uint32(c.b * 0xFFFF), uint32(c.a * 0xFFFF)
 }
