@@ -12,7 +12,8 @@ import (
 
 func main() {
 	fmt.Println("Start main")
-	drawDiscourseCard()
+	//drawCmurrLogo(512, true, [4]string{"000000", "000000", "000000", "000000"})
+	//drawCmurrLogo(512, true, [4]string{"C40233", "FFD300", "009F6B", "0087BD"})
 	fmt.Println("End main")
 }
 
