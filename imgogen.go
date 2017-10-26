@@ -12,13 +12,13 @@ import (
 
 func main() {
 	fmt.Println("Start main")
-	//drawCmurrLogo(512, true, [4]string{"000000", "000000", "000000", "000000"})
-	//drawCmurrLogo(512, true, [4]string{"C40233", "FFD300", "009F6B", "0087BD"})
+	//drawCmurrLogo("cmurrLogo.svg", 512, true, [4]string{"000000", "000000", "000000", "000000"})
+	//drawCmurrLogo("cmurrLogo.svg", 512, true, [4]string{"C40233", "FFD300", "009F6B", "0087BD"})
 	fmt.Println("End main")
 }
 
-func drawDiscourseCard() {
-	outfile, err := os.Create("C:/Users/Christopher/Pictures/discourseCard.png")
+func drawDiscourseCard(outPath string) {
+	outfile, err := os.Create(outPath)
 	Msv(err)
 	defer outfile.Close()
 	outimg := image.NewRGBA(image.Rect(0, 0, 600, 600))
@@ -35,13 +35,13 @@ func drawDiscourseCard() {
 	Msv(png.Encode(outfile, outimg))
 }
 
-func drawSkcraftSummerIcon() {
-	infile, err := os.Open("C:/Users/Christopher/Pictures/skcraftIcon.png")
+func drawSkcraftSummerIcon(inPath, outPath string) {
+	infile, err := os.Open(inPath)
 	Msv(err)
 	defer infile.Close()
 	inimg, err := png.Decode(infile)
 	Msv(err)
-	outfile, err := os.Create("C:/Users/Christopher/Pictures/skcraftIconSummer.png")
+	outfile, err := os.Create(outPath)
 	Msv(err)
 	defer outfile.Close()
 	outimg := image.NewRGBA(inimg.Bounds())

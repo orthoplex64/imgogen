@@ -7,9 +7,9 @@ import (
 )
 
 // this logo is something I came up with several years ago
-func drawCmurrLogo(scale float64, useViewBox bool, ringColors [4]string) {
+func drawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4]string) {
 	sqrt3, sqrt7, sqrt8 := math.Sqrt(3), math.Sqrt(7), math.Sqrt(8)
-	outfile, err := os.Create("C:/Users/Christopher/Pictures/cmurrLogo.svg")
+	outfile, err := os.Create(outPath)
 	Msv(err)
 	defer outfile.Close()
 	_, err = fmt.Fprintf(outfile, `<svg xmlns="http://www.w3.org/2000/svg" `)
