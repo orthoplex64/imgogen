@@ -8,14 +8,22 @@ import (
 	"math"
 	"os"
 
+	"github.com/orthoplex64/imgogen/logo"
 	"github.com/orthoplex64/imgogen/util"
 )
 
 func main() {
 	fmt.Println("Start main")
-	//logo.DrawCmurrLogo("cmurrLogo.svg", 512, true, [4]string{"000000", "000000", "000000", "000000"})
-	//drawCmurrLogo("cmurrLogo.svg", 512, true, [4]string{"C40233", "FFD300", "009F6B", "0087BD"})
 	fmt.Println("End main")
+}
+
+func drawOfficialCmurrLogoPNG(outPath string, width, height int) {
+	logo.DrawCmurrLogoPNG(outPath, width, height, 16, [4]*util.FColor{
+		util.ARGB32ToFColor(0xFFAA0055),
+		util.ARGB32ToFColor(0xFFFFAA00),
+		util.ARGB32ToFColor(0xFF00AA55),
+		util.ARGB32ToFColor(0xFF0055AA),
+	}, util.ARGB32ToFColor(0x00000000))
 }
 
 func drawDiscourseCard(outPath string) {
@@ -25,7 +33,7 @@ func drawDiscourseCard(outPath string) {
 	outimg := image.NewRGBA(image.Rect(0, 0, 600, 600))
 	bounds := outimg.Bounds()
 	width, height := bounds.Dx(), bounds.Dy()
-	util.RenderByFunc(nil, outimg, 1, func(inimg image.Image, outimg draw.Image, ix int, iy int, x float64, y float64) *util.FColor {
+	util.RenderByFunc(nil, outimg, 1, func(inimg image.Image, outimg draw.Image, ix, iy int, x, y float64) *util.FColor {
 		x, y = x-float64(width)/2, y-float64(height)*1.5
 		return util.HSVToFColor((math.Atan2(y, x)+math.Pi)/math.Pi/2*8+1.0/2+math.Sin(math.Hypot(x, y)/50), 1, 1)
 		//c := SinHueToFColor((math.Atan2(y, x)+math.Pi)/math.Pi/2*8 + 1.0/2 + math.Sin(math.Hypot(x, y)/50))
@@ -52,7 +60,7 @@ func drawSkcraftSummerIcon(inPath, outPath string) {
 	fmt.Println("Dims:", width, height)
 	colorFG, colorBG := util.ARGB32ToFColor(0xFFDC5037), util.ARGB32ToFColor(0xFFFFFFFF)
 	distFGBG := colorFG.RGBDist(colorBG)
-	util.RenderByFunc(inimg, outimg, 5, func(inimg image.Image, outimg draw.Image, ix int, iy int, x float64, y float64) *util.FColor {
+	util.RenderByFunc(inimg, outimg, 5, func(inimg image.Image, outimg draw.Image, ix, iy int, x, y float64) *util.FColor {
 		c := util.ColorToFColor(inimg.At(ix, iy))
 		distFG := c.RGBDist(colorFG)
 		if math.Mod(((math.Atan2(y, x)+math.Pi)/math.Pi/2+1.0/80.0+1.0/80.0*0.1)*4*10, 1) < 0.2 || math.Hypot(x, y) < 120 {

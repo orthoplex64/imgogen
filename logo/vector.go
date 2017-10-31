@@ -8,8 +8,8 @@ import (
 	"github.com/orthoplex64/imgogen/util"
 )
 
-// DrawCmurrLogo genereates an SVG of a design I came up with several years ago (as of 2017)
-func DrawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4]string) {
+// DrawCmurrLogoSVG genereates an SVG file of a design I came up with several years ago (as of 2017)
+func DrawCmurrLogoSVG(outPath string, scale float64, useViewBox bool, ringColors [4]string) {
 	sqrt3, sqrt7, sqrt8 := math.Sqrt(3), math.Sqrt(7), math.Sqrt(8)
 	outfile, err := os.Create(outPath)
 	util.Msv(err)

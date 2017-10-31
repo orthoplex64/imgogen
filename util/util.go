@@ -28,6 +28,14 @@ func RenderByFunc(inimg image.Image, outimg draw.Image, aa int,
 	}
 }
 
+// Min returns the minimum of a and b
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // Msv - short for "must've"
 func Msv(err error) {
 	if err != nil {
