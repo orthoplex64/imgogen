@@ -1,34 +1,36 @@
-package main
+package logo
 
 import (
 	"fmt"
 	"math"
 	"os"
+
+	"github.com/orthoplex64/imgogen/util"
 )
 
-// this logo is something I came up with several years ago
-func drawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4]string) {
+// DrawCmurrLogo genereates an SVG of a design I came up with several years ago (as of 2017)
+func DrawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4]string) {
 	sqrt3, sqrt7, sqrt8 := math.Sqrt(3), math.Sqrt(7), math.Sqrt(8)
 	outfile, err := os.Create(outPath)
-	Msv(err)
+	util.Msv(err)
 	defer outfile.Close()
 	_, err = fmt.Fprintf(outfile, `<svg xmlns="http://www.w3.org/2000/svg" `)
-	Msv(err)
+	util.Msv(err)
 	if useViewBox {
 		_, err = fmt.Fprintf(outfile, `viewBox="0 0 %[1]v %[1]v">`, scale)
 	} else {
 		_, err = fmt.Fprintf(outfile, `width="%[1]v" height="%[1]v">`, scale)
 	}
-	Msv(err)
+	util.Msv(err)
 	// create ring color classes
 	_, err = fmt.Fprintf(outfile, "<defs><style>")
-	Msv(err)
+	util.Msv(err)
 	for i := 0; i < 4; i++ {
 		_, err = fmt.Fprintf(outfile, ".ring-%v{fill:#%v;}", i, ringColors[i])
-		Msv(err)
+		util.Msv(err)
 	}
 	_, err = fmt.Fprintf(outfile, "</style></defs><title>CMurr Logo</title>")
-	Msv(err)
+	util.Msv(err)
 	// rotates point clockwise numTimes times
 	rotatePoint := func(point [2]float64, numTimes int) [2]float64 {
 		for i := 0; i < numTimes; i++ {
@@ -67,12 +69,12 @@ func drawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4
 			// iterate rings
 			for ring := 0; ring < 4; ring++ {
 				_, err = fmt.Fprintf(outfile, `<path class="ring-%d" d="`, ring)
-				Msv(err)
+				util.Msv(err)
 				for i, pPoint := range iPath {
 					point := toSvgCoords(rotatePoint(pPoint.point, ring))
 					if i == 0 {
 						_, err = fmt.Fprintf(outfile, "M %v %v", point[0], point[1])
-						Msv(err)
+						util.Msv(err)
 					} else {
 						var sweepFlag int
 						if pPoint.isConvex {
@@ -81,11 +83,11 @@ func drawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4
 							sweepFlag = 0
 						}
 						_, err = fmt.Fprintf(outfile, " A %[1]v %[1]v 0 0 %v %v %v", pPoint.arcRadius*scale/8, sweepFlag, point[0], point[1])
-						Msv(err)
+						util.Msv(err)
 					}
 				}
 				_, err = fmt.Fprint(outfile, `"/>`)
-				Msv(err)
+				util.Msv(err)
 			}
 		}
 	}
@@ -120,5 +122,5 @@ func drawCmurrLogo(outPath string, scale float64, useViewBox bool, ringColors [4
 		{point: [2]float64{1, 1}, arcRadius: 2, isConvex: true},
 	}, false)
 	_, err = fmt.Fprintln(outfile, "</svg>")
-	Msv(err)
+	util.Msv(err)
 }
