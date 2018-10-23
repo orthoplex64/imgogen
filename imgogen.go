@@ -17,6 +17,10 @@ func main() {
 	fmt.Println("End main")
 }
 
+func drawOfficialCmurrLogoSVG(outPath string, scale float64, useViewBox bool) {
+	logo.DrawCmurrLogoSVG(outPath, scale, useViewBox, [4]string{"A05", "FA0", "0A5", "05A"})
+}
+
 func drawOfficialCmurrLogoPNG(outPath string, width, height int) {
 	logo.DrawCmurrLogoPNG(outPath, width, height, 16, [4]*util.FColor{
 		util.ARGB32ToFColor(0xFFAA0055),
